@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Leaf fall</title>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+<script type="text/javascript">
+  function generateRandomIntegerInRange(min, max) {
+    return Math.floor(Math.random() * (max - min + 1)) + min;
+  }
+  const imageSrc1 = "https://creazilla-store.fra1.digitaloceanspaces.com/cliparts/69520/silver-birch-late-autumn-leaf-clipart-md.png";
+  const imageSrc2 = 'https://assets.stickpng.com/images/589b1fd02096a705e895cd6e.png';
+  const leafsAmount = 50;
+  let windowWidth = window.innerWidth;
+  let windowHeight = window.innerHeight;
+  window.onresize = function() {
+    windowWidth = window.innerWidth;
+    windowHeight = window.innerHeight;
+  }
+
+  const snowDx = [];
+  const snowXp = [];
+  const snowYp = [];
+  const snowAm = [];
+  const snowStx = [];
+  const snowSty = [];
+  let timerId = null;
+  
+  for (i = 0; i < leafsAmount; i++) {
+    snowDx[i] = 0;
+    snowXp[i] = Math.random()*(windowWidth-50);
+    snowYp[i] = Math.random()*windowHeight;
+    snowAm[i] = Math.random()*20;
+    snowStx[i] = 0.02 + Math.random()/10;
+    snowSty[i] = 0.7 + Math.random();
+    const imageSrc = i % 2 === 0 ? imageSrc1 : imageSrc2;
+    const imageSize = `${generateRandomIntegerInRange(10, 16)}px`;
+    const leaf = $(`<img id="leaf${i}" src="${imageSrc}" class="rotate" />`).css({
+      position: 'absolute',
+      'z-index': 10000,
+      border: 'none',
+      width: imageSize,
+      height: imageSize,
+    });
+    $(document.documentElement).append(leaf);
+  }
+
+  function leafFallStart() {
+    for (i = 0; i < leafsAmount; i++) {
+      snowYp[i] += snowSty[i];
+      if (snowYp[i] > windowHeight-20) {
+        snowXp[i] = Math.random()*(windowWidth-snowAm[i]-30);
+        snowYp[i] = 0;
+        snowStx[i] = 0.02 + Math.random()/10;
+        snowSty[i] = 0.7 + Math.random();
+      }
+      snowDx[i] += snowStx[i];
+      $(`#leaf${i}`).css({
+        top: snowYp[i]+"px",
+        left: snowXp[i] + snowAm[i]*Math.sin(snowDx[i])+"px"
+      });
+    }
+    if (timerId != null) {
+      clearTimeout(timerId);
+    }
+    timerId = setTimeout(leafFallStart, 10); 
+  }
+  leafFallStart();
+</script>
+<style>
+  @keyframes rotate {
+    from {transform: rotateZ(20deg)}
+    to {transform: rotateZ(-20deg)}
+  }
+
+  .rotate {
+    animation: rotate 1s ease-in-out 0s infinite alternate;
+  }
+</style>
+</head>
+<body></body>
+</html>
